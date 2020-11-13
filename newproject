@@ -1,0 +1,46 @@
+#!/bin/sh
+
+IGNORED_FILES_PATTERN=".git"
+
+print_usage() {
+	>&2 echo "Usage:"
+	>&2 echo "$0 DIRECTORY BINARY_NAME"
+	exit 1
+}
+
+[[ ! "$#" -eq 2 ]] && print_usage
+
+TARGET_DIR="$1"
+BINARY_NAME="$2"
+
+TARGET_DIR="$(realpath "$TARGET_DIR")"
+
+echo "Initializing project into $TARGET_DIR"
+
+# Check if output directory is empty
+EXISTING_FILES=$(ls $TARGET_DIR 2>/dev/null | grep -v $IGNORED_FILES_PATTERN -)
+if [[ $EXISTING_FILES != "" ]]; then
+	echo "$TARGET_DIR already contains the following files:"
+	echo $EXISTING_FILES
+	read -p "Continue? " -n 1 -r
+	echo
+	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+		 exit 1
+	fi
+fi
+
+# Go to this script's directory, where the files reside
+cd $(dirname "$BASH_SOURCE")
+
+mkdir -p "$TARGET_DIR"
+
+cp Makefile "$TARGET_DIR/Makefile"
+cp gitignore "$TARGET_DIR/.gitignore"
+
+sed -i -e "s/BINARYNAME_PLACEHOLDER/$BINARY_NAME/" \
+	"$TARGET_DIR/Makefile" "$TARGET_DIR/.gitignore"
+
+mkdir -p "$TARGET_DIR/src"
+mkdir -p "$TARGET_DIR/include"
+
+echo "Initialization completed!"
