@@ -59,7 +59,7 @@ DEPDIR = build/dep
 SUBDIR_R = release
 SUBDIR_D = debug
 
-SRCEXT = .cpp
+SRCEXT = .cpp .cc
 
 RM = rm -f
 
@@ -75,12 +75,12 @@ OBJDIR_D ::= $(OBJDIR)/$(SUBDIR_D)
 DEPDIR_R ::= $(DEPDIR)/$(SUBDIR_R)
 DEPDIR_D ::= $(DEPDIR)/$(SUBDIR_D)
 
-SOURCES ::= $(wildcard $(SRCDIR)/*$(SRCEXT))
-OBJS_R  ::= $(patsubst $(SRCDIR)/%$(SRCEXT),$(OBJDIR_R)/%.o,$(SOURCES))
-OBJS_D  ::= $(patsubst $(SRCDIR)/%$(SRCEXT),$(OBJDIR_D)/%.o,$(SOURCES))
+SOURCES ::= $(foreach ext, $(SRCEXT), $(wildcard $(SRCDIR)/*$(ext)))
+OBJS_R  ::= $(foreach ext, $(SRCEXT), $(patsubst $(SRCDIR)/%$(ext),$(OBJDIR_R)/%.o,$(filter %$(ext), $(SOURCES))))
+OBJS_D  ::= $(foreach ext, $(SRCEXT), $(patsubst $(SRCDIR)/%$(ext),$(OBJDIR_D)/%.o,$(filter %$(ext), $(SOURCES))))
 
-DEPS ::= $(patsubst $(SRCDIR)/%$(SRCEXT),$(DEPDIR_R)/%.d,$(SOURCES)) \
-         $(patsubst $(SRCDIR)/%$(SRCEXT),$(DEPDIR_D)/%.d,$(SOURCES))
+DEPS ::= $(foreach ext, $(SRCEXT), $(patsubst $(SRCDIR)/%$(ext),$(DEPDIR_R)/%.d,$(filter %$(ext), $(SOURCES)))) \
+         $(foreach ext, $(SRCEXT), $(patsubst $(SRCDIR)/%$(ext),$(DEPDIR_D)/%.d,$(filter %$(ext), $(SOURCES))))
 
 BIN_R ::= $(BINDIR)/$(BINNAME_R)
 BIN_D ::= $(BINDIR)/$(BINNAME_D)
@@ -121,13 +121,16 @@ $(BIN_D): $(OBJS_D) | $(BINDIR)/.
 $(DEPS): ;
 include $(wildcard $(DEPS))
 
-$(OBJDIR_R)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_R)/%.d | $(OBJDIR_R)/. $(DEPDIR_R)/.
-	$(CXX) $(CXXFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R)
-	$(POSTCOMPILE_R)
+define compile_rule
+$$(OBJDIR_R)/%.o: $$(SRCDIR)/%$1 $$(DEPDIR_R)/%.d | $$(OBJDIR_R)/. $$(DEPDIR_R)/.
+	$$(CXX) $$(CXXFLAGS) $$(FLAGS_R) $$(INCFLAGS) -c $$< -o $$@ $$(DEPGENFLAGS_R)
+	$$(POSTCOMPILE_R)
 
-$(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $(OBJDIR_D)/. $(DEPDIR_D)/.
-	$(CXX) $(CXXFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D)
-	$(POSTCOMPILE_D)
+$$(OBJDIR_D)/%.o: $$(SRCDIR)/%$1 $$(DEPDIR_D)/%.d | $$(OBJDIR_D)/. $$(DEPDIR_D)/.
+	$$(CXX) $$(CXXFLAGS) $$(FLAGS_D) $$(INCFLAGS) -c $$< -o $$@ $$(DEPGENFLAGS_D)
+	$$(POSTCOMPILE_D)
+endef
+$(foreach ext,$(SRCEXT),$(eval $(call compile_rule,$(ext))))
 
 .PHONY: c
 c:
