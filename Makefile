@@ -139,9 +139,9 @@ $(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $$(dir $$@). $$(dir $(DE
 
 .PHONY: c
 c:
-	-find . -type f -path './$(OBJDIR)/*.o'  -delete
-	-find . -type f -path './$(DEPDIR)/*.d'  -delete
-	-find . -type f -path './$(DEPDIR)/*.Td' -delete
+	-find . -type f -path './$(OBJDIR)/*.o'  -exec $(RM) {} +
+	-find . -type f -path './$(DEPDIR)/*.d'  -exec $(RM) {} +
+	-find . -type f -path './$(DEPDIR)/*.Td' -exec $(RM) {} +
 
 .PHONY: clean
 clean: c
