@@ -139,12 +139,12 @@ $(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $$(dir $$@). $$(dir $(DE
 
 .PHONY: c
 c:
-	-find $(OBJDIR) -type f -name '*.o'  -delete 2>/dev/null
-	-find $(DEPDIR) -type f -name '*.d'  -delete 2>/dev/null
-	-find $(DEPDIR) -type f -name '*.Td' -delete 2>/dev/null
+	-find . -type f -path './$(OBJDIR)/*.o'  -delete
+	-find . -type f -path './$(DEPDIR)/*.d'  -delete
+	-find . -type f -path './$(DEPDIR)/*.Td' -delete
 
 .PHONY: clean
 clean: c
-	$(RM) $(BIN_R)
-	$(RM) $(BIN_D)
-	-find $(OBJDIR) $(DEPDIR) $(BINDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null
+	-$(RM) $(BIN_R)
+	-$(RM) $(BIN_D)
+	-find $(OBJDIR) $(DEPDIR) $(BINDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
