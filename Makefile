@@ -8,8 +8,8 @@
 # run:     build the release binary and run it
 # rrun:    build the release binary and run it
 # drun:    build the debug binary and run it
-# c:       clean object and dependency files
-# clean:   clean all build byproducts, the binary and empty directories
+# c:       clean all build byproducts
+# clean:   clean all build byproducts and the binaries
 
 # To use "run" and "drun" with arguments, use:
 # make run ARGS="arguments here"
@@ -142,9 +142,10 @@ c:
 	-find . -type f -path './$(OBJDIR)/*.o'  -exec $(RM) {} +
 	-find . -type f -path './$(DEPDIR)/*.d'  -exec $(RM) {} +
 	-find . -type f -path './$(DEPDIR)/*.Td' -exec $(RM) {} +
+	-find $(OBJDIR) $(DEPDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
 
 .PHONY: clean
 clean: c
 	-$(RM) $(BIN_R)
 	-$(RM) $(BIN_D)
-	-find $(OBJDIR) $(DEPDIR) $(BINDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
+	-find $(BINDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
