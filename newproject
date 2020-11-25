@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 IGNORED_FILES_PATTERN=".git"
 
