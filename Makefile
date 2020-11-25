@@ -70,6 +70,16 @@ MKBIN_D = $(CXX) $(CXXFLAGS) $(FLAGS_D) $^ $(LDFLAGS) -o $@
 
 ################################################################################
 
+# Compatibility check
+
+has_features := $(if $(filter default,$(origin .FEATURES)),$(if $(.FEATURES),T))
+
+ifneq ($(has_features),T)
+$(error GNU make 3.81 or higher is required)
+endif
+
+################################################################################
+
 OBJDIR_R ::= $(OBJDIR)/$(SUBDIR_R)
 OBJDIR_D ::= $(OBJDIR)/$(SUBDIR_D)
 DEPDIR_R ::= $(DEPDIR)/$(SUBDIR_R)
