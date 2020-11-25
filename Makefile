@@ -70,12 +70,18 @@ MKBIN_D = $(CXX) $(CXXFLAGS) $(FLAGS_D) $^ $(LDFLAGS) -o $@
 
 ################################################################################
 
+# Functions
+
+rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
+
+################################################################################
+
 OBJDIR_R ::= $(OBJDIR)/$(SUBDIR_R)
 OBJDIR_D ::= $(OBJDIR)/$(SUBDIR_D)
 DEPDIR_R ::= $(DEPDIR)/$(SUBDIR_R)
 DEPDIR_D ::= $(DEPDIR)/$(SUBDIR_D)
 
-SOURCES ::= $(wildcard $(SRCDIR)/*$(SRCEXT))
+SOURCES ::= $(call rwildcard,$(SRCDIR)/,*$(SRCEXT))
 OBJS_R  ::= $(patsubst $(SRCDIR)/%$(SRCEXT),$(OBJDIR_R)/%.o,$(SOURCES))
 OBJS_D  ::= $(patsubst $(SRCDIR)/%$(SRCEXT),$(OBJDIR_D)/%.o,$(SOURCES))
 
@@ -121,20 +127,20 @@ $(BIN_D): $(OBJS_D) | $(BINDIR)/.
 $(DEPS): ;
 include $(wildcard $(DEPS))
 
-$(OBJDIR_R)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_R)/%.d | $(OBJDIR_R)/. $(DEPDIR_R)/.
+.SECONDEXPANSION:
+$(OBJDIR_R)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_R)/%.d | $$(dir $$@). $$(dir $(DEPDIR_R)/$$*.d).
 	$(CXX) $(CXXFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R)
 	$(POSTCOMPILE_R)
 
-$(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $(OBJDIR_D)/. $(DEPDIR_D)/.
+$(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $$(dir $$@). $$(dir $(DEPDIR_D)/$$*.d).
 	$(CXX) $(CXXFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D)
 	$(POSTCOMPILE_D)
 
 .PHONY: c
 c:
-	$(RM) $(OBJDIR_R)/*.o
-	$(RM) $(OBJDIR_D)/*.o
-	$(RM) $(DEPDIR_R)/*.d
-	$(RM) $(DEPDIR_D)/*.d
+	-find $(OBJDIR) -type f -name '*.o'  -delete 2>/dev/null
+	-find $(DEPDIR) -type f -name '*.d'  -delete 2>/dev/null
+	-find $(DEPDIR) -type f -name '*.Td' -delete 2>/dev/null
 
 .PHONY: clean
 clean: c
