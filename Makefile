@@ -131,13 +131,12 @@ $(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $(OBJDIR_D)/. $(DEPDIR_D
 
 .PHONY: c
 c:
-	$(RM) $(OBJDIR_R)/*.o
-	$(RM) $(OBJDIR_D)/*.o
-	$(RM) $(DEPDIR_R)/*.d
-	$(RM) $(DEPDIR_D)/*.d
+	-find $(OBJDIR) -type f -name '*.o'  -delete 2>/dev/null
+	-find $(DEPDIR) -type f -name '*.d'  -delete 2>/dev/null
+	-find $(DEPDIR) -type f -name '*.Td' -delete 2>/dev/null
 
 .PHONY: clean
 clean: c
 	$(RM) $(BIN_R)
 	$(RM) $(BIN_D)
-	find -P . -mindepth 1 -type d -empty -delete
+	-find $(OBJDIR) $(DEPDIR) $(BINDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null
