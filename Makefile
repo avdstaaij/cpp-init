@@ -98,7 +98,8 @@ POSTCOMPILE_R = mv -f $(DEPDIR_R)/$*.Td $(DEPDIR_R)/$*.d && touch $@
 POSTCOMPILE_D = mv -f $(DEPDIR_D)/$*.Td $(DEPDIR_D)/$*.d && touch $@
 
 .PRECIOUS: $(BINDIR)/. $(SRCDIR)/. \
-           $(OBJDIR_R)/. $(OBJDIR_D)/. $(DEPDIR_R)/. $(DEPDIR_D)/.
+           $(patsubst %,%.,$(dir $(OBJS_R))) $(patsubst %,%.,$(dir $(OBJS_D))) \
+           $(patsubst %,%.,$(dir $(DEPS)))
 
 
 .PHONY: all run
