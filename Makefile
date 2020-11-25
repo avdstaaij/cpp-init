@@ -147,4 +147,4 @@ c:
 clean: c
 	$(RM) $(BIN_R)
 	$(RM) $(BIN_D)
-	find -P . -mindepth 1 -type d -empty -delete
+	-find $(OBJDIR) $(DEPDIR) $(BINDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null
