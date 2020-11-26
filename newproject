@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 IGNORED_FILES_PATTERN=".git"
 
@@ -8,7 +8,7 @@ print_usage() {
 	exit 1
 }
 
-[[ ! "$#" -eq 2 ]] && print_usage
+[ ! "$#" -eq 2 ] && print_usage
 
 TARGET_DIR="$1"
 BINARY_NAME="$2"
@@ -19,12 +19,12 @@ echo "Initializing project into $TARGET_DIR"
 
 # Check if output directory is empty
 EXISTING_FILES=$(ls $TARGET_DIR 2>/dev/null | grep -v $IGNORED_FILES_PATTERN -)
-if [[ $EXISTING_FILES != "" ]]; then
+if [ "$EXISTING_FILES" != "" ]; then
 	echo "$TARGET_DIR already contains the following files:"
 	echo $EXISTING_FILES
 	read -p "Continue? " -n 1 -r
 	echo
-	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+	if [ "$REPLY" != "y" ] && [ "$REPLY" != "Y" ]; then
 		 exit 1
 	fi
 fi
