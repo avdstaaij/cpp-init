@@ -9,7 +9,7 @@ managing C++ projects.
 
 ## Installation
 
-First download this repository using git:  
+First download this repository using git:
 ```bash
 git clone https://github.com/avdstaaij/cpp-init
 ```
@@ -55,6 +55,9 @@ The Makefile has the following features:
    Combined with the object file caching, this minimizes recompilation time.
    The dependency generation is fully automated, so there is no need to manually
    specify dependencies.
+ - **Multiple source file extensions.**
+   The Makefile can handle the use of multiple source file extensions at once,
+   such as `.cc` and `.cpp`.
  - **Separate release and debug builds.**
    The Makefile has a system to separately build a release and debug binaries,
    using different compiler flags for each.
@@ -65,7 +68,7 @@ The Makefile has the following features:
  - **Library building support.**
    By adjusting certain setting variables, the Makefile can easily be configured
    to build static or dynamic libraries instead of executables.
- 
+
 The top of the makefile contains instructions that explain how to use the
 various features.
 
