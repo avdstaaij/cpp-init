@@ -128,15 +128,6 @@ $(BIN_D): $(OBJS_D) | $(BINDIR)/.
 $(DEPS): ;
 include $(wildcard $(DEPS))
 
-.SECONDEXPANSION:
-$(OBJDIR_R)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_R)/%.d | $$(dir $$@). $$(dir $(DEPDIR_R)/$$*.d).
-	$(CXX) $(CXXFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R)
-	$(POSTCOMPILE_R)
-
-$(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $$(dir $$@). $$(dir $(DEPDIR_D)/$$*.d).
-	$(CXX) $(CXXFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D)
-	$(POSTCOMPILE_D)
-
 .PHONY: c
 c:
 	-find . -type f -path './$(OBJDIR)/*.o'  -exec $(RM) {} +
@@ -149,3 +140,14 @@ clean: c
 	-$(RM) $(BIN_R)
 	-$(RM) $(BIN_D)
 	-find $(BINDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
+
+
+.SECONDEXPANSION:
+
+$(OBJDIR_R)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_R)/%.d | $$(dir $$@). $$(dir $(DEPDIR_R)/$$*.d).
+	$(CXX) $(CXXFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R)
+	$(POSTCOMPILE_R)
+
+$(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $$(dir $$@). $$(dir $(DEPDIR_D)/$$*.d).
+	$(CXX) $(CXXFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D)
+	$(POSTCOMPILE_D)
