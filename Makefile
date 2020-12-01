@@ -19,7 +19,8 @@
 # Because the dependency generation is fully automated using compiler tools,
 # there is no need to specify a header extension (e.g. ".h").
 
-# The lines above the #-line can be altered to change the build behavior.
+# The lines above the "Are you sure you know what you're doing" header can be
+# altered to change the build behavior.
 # CXX specifies the compiler, CXXFLAGS the compiler flags.
 # FLAGS_R and FLAGS_D contain release and debug-specific flags respectively.
 # LDFLAGS contains the compiler flags related to linking.
@@ -68,13 +69,16 @@ ARGS =
 MKBIN_R = $(CXX) $(CXXFLAGS) $(FLAGS_R) $^ $(LDFLAGS) -o $@
 MKBIN_D = $(CXX) $(CXXFLAGS) $(FLAGS_D) $^ $(LDFLAGS) -o $@
 
-################################################################################
+#==============================================================================#
+#------------------ Are you sure you know what you're doing? ------------------#
+#==============================================================================#
 
 # Functions
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 
-################################################################################
+
+# Variables
 
 OBJDIR_R ::= $(OBJDIR)/$(SUBDIR_R)
 OBJDIR_D ::= $(OBJDIR)/$(SUBDIR_D)
@@ -97,10 +101,12 @@ DEPGENFLAGS_D = -MT "$@" -MMD -MP -MF $(DEPDIR_D)/$*.Td
 POSTCOMPILE_R = mv -f $(DEPDIR_R)/$*.Td $(DEPDIR_R)/$*.d && touch $@
 POSTCOMPILE_D = mv -f $(DEPDIR_D)/$*.Td $(DEPDIR_D)/$*.d && touch $@
 
+
+# Targets
+
 .PRECIOUS: $(BINDIR)/. $(SRCDIR)/. \
            $(addsuffix .,$(dir $(OBJS_R))) $(addsuffix .,$(dir $(OBJS_D))) \
            $(addsuffix .,$(dir $(DEPS)))
-
 
 .PHONY: all run
 all: release
