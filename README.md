@@ -1,6 +1,6 @@
 # cpp-init
 
-*One Makefile to rule them all*
+*One Makefile To Rule Them All*
 
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
@@ -9,7 +9,7 @@ managing C++ projects.
 
 ## Installation
 
-First download this repository using git:  
+First download this repository using git:
 ```bash
 git clone https://github.com/avdstaaij/cpp-init
 ```
@@ -68,7 +68,7 @@ The Makefile has the following features:
  - **Library building support.**
    By adjusting certain setting variables, the Makefile can easily be configured
    to build static or dynamic libraries instead of executables.
- 
+
 The top of the makefile contains instructions that explain how to use the
 various features.
 
