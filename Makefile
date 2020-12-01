@@ -1,5 +1,5 @@
 # Generic C++ Makefile
-# Arthur van der Staaij and Aron de Jong, 2020-9-24
+# Arthur van der Staaij and Aron de Jong
 
 # Besides  actual build targets, the following rules are provided:
 # all:     build the release binary (with FLAGS_R)
