@@ -55,8 +55,11 @@ The Makefile has the following features:
    Combined with the object file caching, this minimizes recompilation time.
    The dependency generation is fully automated, so there is no need to manually
    specify dependencies.
+ - **Source file trees.**
+   Source files can be organized with subdirectories, and the Makefile will
+   handle them just as well.
  - **Separate release and debug builds.**
-   The Makefile has a system to separately build a release and debug binaries,
+   The Makefile has a system to separately build release and debug binaries,
    using different compiler flags for each.
  - **Project cleaning.**
    The Makefile has rules to clean generated files from your project. You can
