@@ -1,15 +1,22 @@
 # Generic C++ Makefile
-# Arthur van der Staaij and Aron de Jong
+# Made by Arthur van der Staaij and Aron de Jong
 
-# Besides  actual build targets, the following rules are provided:
-# all:     build the release binary (with FLAGS_R)
-# release: build the release binary (with FLAGS_R)
-# debug:   build the debug binary (with FLAGS_D)
-# run:     build the release binary and run it
-# rrun:    build the release binary and run it
-# drun:    build the debug binary and run it
-# c:       clean all build byproducts
-# clean:   clean all build byproducts and the binaries
+# To download the latest version, report issues or request new features, visit
+# https://github.com/avdstaaij/cpp-init
+
+#==============================================================================#
+#----------------------------- Usage instructions -----------------------------#
+#==============================================================================#
+
+# Besides actual build targets, the following rules are provided:
+# all:      Build the release binary (with FLAGS_R)
+# release:  Build the release binary (with FLAGS_R)
+# debug:    Build the debug binary (with FLAGS_D)
+# run:      Build the release binary and run it
+# rrun:     Build the release binary and run it
+# drun:     Build the debug binary and run it
+# c:        Clean all build byproducts
+# clean:    Clean all build byproducts and the binaries
 
 # To use "run" and "drun" with arguments, use:
 # make run ARGS="arguments here"
@@ -19,55 +26,63 @@
 # Because the dependency generation is fully automated using compiler tools,
 # there is no need to specify a header extension (e.g. ".h").
 
-# The lines above the "Are you sure you know what you're doing" header can be
-# altered to change the build behavior.
-# CXX specifies the compiler, CXXFLAGS the compiler flags.
-# FLAGS_R and FLAGS_D contain release and debug-specific flags respectively.
-# LDFLAGS contains the compiler flags related to linking.
-# INCFLAGS contains the compiler flags related to file inclusion.
-# BINNAME_R and BINNAME_D are the names of the release and debug binaries.
-# The binaries will be placed in BINDIR. Source files are read from SRCDIR.
-# Object files are kept in OBJDIR/SUBDIR_R and OBJDIR/SUBDIR_D.
-# Dependency files are kept in DEPDIR/SUBDIR_R and DEPDIR/SUBDIR_D.
-# SRCEXT specifies the extension of source files (e.g. ".cpp").
-# RM contains the command that is used to clean files (rules "c" and "clean")
-# ARGS is appended to binary invocations (rules "run" and "drun")
+# The variables below the "Settings" header can be altered to change the build
+# behavior. Their meaning is as follows:
+
+# CXX        The C++ compiler
+# CXXFLAGS   Compiler flags, both for building object files and linking them
+# FLAGS_R    Release-specific compiler flags
+# FLAGS_D    Debug-specific compiler flags
+# LDFLAGS    Compiler flags used when linking the the binary
+# INCFLAGS   Compiler flags for file inclusion; used for building object files
+# BINNAME_R  The name of the generated release binary
+# BINNAME_D  The name of the genereated debug binary
+
+# BINDIR     Directory in which the binaries are placed
+# SRCDIR     Directory in which to look for C++ source files
+# OBJDIR     Directory in which generated object files are placed
+# DEPDIR     Directory in which generated dependency files are placed
+# SUBDIR_R   Subdirectory for release build files
+# SUBDIR_D   Subdirectory for debug build files
+
+# SRCEXT     Extension of C++ source files
+# ARGS       Text to append to binary invocations (rules "run" and "drun")
+# RM         The command that is used to remove files (rules "c" and "clean")
 
 # MKBIN_R and MKBIN_D are the commands used to build the final binaries. These
 # can be changed for advanced usage, such as building libraries. Make will run
 # these commands with $^ set to the list of object files and $@ set to the path
 # of the binary to create.
 
-CXX = g++
+#==============================================================================#
+#---------------------------------- Settings ----------------------------------#
+#==============================================================================#
 
-CXXFLAGS = -std=c++17 -Wall -Wextra -Wignored-qualifiers
+CXX       = g++
 
-FLAGS_R = -O2
-FLAGS_D = -g
-
-LDFLAGS =
-
-INCFLAGS = -I include
+CXXFLAGS  = -std=c++17 -Wall -Wextra -Wignored-qualifiers
+FLAGS_R   = -O2
+FLAGS_D   = -g
+LDFLAGS   =
+INCFLAGS  = -I include
 
 BINNAME_R = BINARYNAME_PLACEHOLDER
 BINNAME_D = $(BINNAME_R)_debug
 
-BINDIR = bin
-SRCDIR = src
-OBJDIR = build/obj
-DEPDIR = build/dep
+BINDIR    = bin
+SRCDIR    = src
+OBJDIR    = build/obj
+DEPDIR    = build/dep
 
-SUBDIR_R = release
-SUBDIR_D = debug
+SUBDIR_R  = release
+SUBDIR_D  = debug
 
-SRCEXT = .cpp
+SRCEXT    = .cpp
+ARGS      =
+RM        = rm -f
 
-RM = rm -f
-
-ARGS =
-
-MKBIN_R = $(CXX) $(CXXFLAGS) $(FLAGS_R) $^ $(LDFLAGS) -o $@
-MKBIN_D = $(CXX) $(CXXFLAGS) $(FLAGS_D) $^ $(LDFLAGS) -o $@
+MKBIN_R   = $(CXX) $(CXXFLAGS) $(FLAGS_R) $^ $(LDFLAGS) -o $@
+MKBIN_D   = $(CXX) $(CXXFLAGS) $(FLAGS_D) $^ $(LDFLAGS) -o $@
 
 #==============================================================================#
 #------------------ Are you sure you know what you're doing? ------------------#
