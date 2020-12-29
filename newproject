@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IGNORED_FILES_PATTERN=".git"
+FILES_TO_COPY="Makefile .gitignore"
 
 print_usage() {
 	>&2 echo "Usage:"
@@ -17,12 +17,17 @@ TARGET_DIR="$(realpath "$TARGET_DIR")"
 
 echo "Initializing project into $TARGET_DIR"
 
-# Check if output directory is empty
-EXISTING_FILES=$(ls $TARGET_DIR 2>/dev/null | grep -v $IGNORED_FILES_PATTERN -)
-if [[ $EXISTING_FILES != "" ]]; then
-	echo "$TARGET_DIR already contains the following files:"
-	echo $EXISTING_FILES
-	read -p "Continue? " -n 1 -r
+# Ask for confirmation if any files will be overwritten
+FILES_TO_OVERWRITE=""
+for filename in $FILES_TO_COPY; do
+	if [[ -e "$TARGET_DIR/$filename" ]]; then
+		FILES_TO_OVERWRITE="$FILES_TO_OVERWRITE$filename "
+	fi
+done
+if [[ -n "$FILES_TO_OVERWRITE" ]]; then
+	echo "The following files in $TARGET_DIR will be overwritten:"
+	echo `tput setaf 1`"$FILES_TO_OVERWRITE"`tput sgr0`
+	read -p "Continue (y/n)? " -n 1 -r
 	echo
 	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 		 exit 1
@@ -34,8 +39,8 @@ cd $(dirname "$BASH_SOURCE")
 
 mkdir -p "$TARGET_DIR"
 
-cp Makefile "$TARGET_DIR/Makefile"
-cp gitignore "$TARGET_DIR/.gitignore"
+cp -f Makefile "$TARGET_DIR/Makefile"
+cp -f gitignore "$TARGET_DIR/.gitignore"
 
 sed -i -e "s/BINARYNAME_PLACEHOLDER/$BINARY_NAME/" \
 	"$TARGET_DIR/Makefile" "$TARGET_DIR/.gitignore"
