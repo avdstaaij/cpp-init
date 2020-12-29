@@ -41,8 +41,6 @@
 # BINDIR     Directory in which the binaries are placed
 # SRCDIR     Directory in which to look for C++ source files
 # BLDDIR     Directory in which generated object and dependency files are placed
-# SUBDIR_R   Subdirectory for release build files
-# SUBDIR_D   Subdirectory for debug build files
 
 # SRCEXT     Extension of C++ source files
 # ARGS       Text to append to binary invocations (rules "run" and "drun")
@@ -72,9 +70,6 @@ BINDIR    = bin
 SRCDIR    = src
 BLDDIR    = build
 
-SUBDIR_R  = release
-SUBDIR_D  = debug
-
 SRCEXT    = .cpp
 ARGS      =
 RM        = rm -f
@@ -101,6 +96,9 @@ rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst 
 
 OBJDIR ::= $(BLDDIR)/obj
 DEPDIR ::= $(BLDDIR)/dep
+
+SUBDIR_R ::= release
+SUBDIR_D ::= debug
 
 OBJDIR_R ::= $(OBJDIR)/$(SUBDIR_R)
 OBJDIR_D ::= $(OBJDIR)/$(SUBDIR_D)
