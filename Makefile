@@ -40,8 +40,7 @@
 
 # BINDIR     Directory in which the binaries are placed
 # SRCDIR     Directory in which to look for C++ source files
-# OBJDIR     Directory in which generated object files are placed
-# DEPDIR     Directory in which generated dependency files are placed
+# BLDDIR     Directory in which generated object and dependency files are placed
 # SUBDIR_R   Subdirectory for release build files
 # SUBDIR_D   Subdirectory for debug build files
 
