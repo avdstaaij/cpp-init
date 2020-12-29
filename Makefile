@@ -70,7 +70,7 @@ BINNAME_D = $(BINNAME_R)_debug
 
 BINDIR    = bin
 SRCDIR    = src
-BLDDIR    = .
+BLDDIR    = build
 
 SUBDIR_R  = release
 SUBDIR_D  = debug
