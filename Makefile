@@ -156,9 +156,9 @@ include $(wildcard $(DEPS))
 
 .PHONY: c
 c:
-	-find . -type f -path './$(OBJDIR)/*.o'  -exec $(RM) {} +
-	-find . -type f -path './$(DEPDIR)/*.d'  -exec $(RM) {} +
-	-find . -type f -path './$(DEPDIR)/*.Td' -exec $(RM) {} +
+	-if [ -d '$(OBJDIR)' ]; then find '$(OBJDIR)' -type f -name '*.o'  -exec $(RM) {} +; fi
+	-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.d'  -exec $(RM) {} +; fi
+	-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.Td' -exec $(RM) {} +; fi
 	-find $(OBJDIR) $(DEPDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
 
 .PHONY: clean
