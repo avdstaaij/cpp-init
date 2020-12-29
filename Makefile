@@ -167,7 +167,7 @@ c:
 clean: c
 	-$(RM) $(BIN_R)
 	-$(RM) $(BIN_D)
-	-find $(BINDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
+	-if [ -d $(BINDIR) ]; then rmdir --ignore-fail-on-non-empty -p $(BINDIR); fi
 
 
 .SECONDEXPANSION:
