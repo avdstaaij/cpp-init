@@ -1,6 +1,9 @@
 # Generic C++ Makefile
 # Made by Arthur van der Staaij and Aron de Jong
 
+# To download the latest version, report issues or request new features, visit
+# https://github.com/avdstaaij/cpp-init
+
 # Besides actual build targets, the following rules are provided:
 # all:     build the release binary (with FLAGS_R)
 # release: build the release binary (with FLAGS_R)
