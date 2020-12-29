@@ -1,7 +1,7 @@
 # Generic C++ Makefile
-# Arthur van der Staaij and Aron de Jong
+# Made by Arthur van der Staaij and Aron de Jong
 
-# Besides  actual build targets, the following rules are provided:
+# Besides actual build targets, the following rules are provided:
 # all:     build the release binary (with FLAGS_R)
 # release: build the release binary (with FLAGS_R)
 # debug:   build the debug binary (with FLAGS_D)
