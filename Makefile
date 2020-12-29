@@ -84,8 +84,9 @@ MKBIN_D   = $(CXX) $(CXXFLAGS) $(FLAGS_D) $^ $(LDFLAGS) -o $@
 # Checks
 
 ifeq ($(BLDDIR), .)
-  $(error "You MONSTER, never set BLDDIR to '.'. This clutters the directories and complicates cleaning.")
+  $(error You MONSTER, never set BLDDIR to '.'! It would clutter your project directory)
 endif
+
 
 # Functions
 
