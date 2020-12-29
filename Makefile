@@ -71,8 +71,7 @@ BINNAME_D = $(BINNAME_R)_debug
 
 BINDIR    = bin
 SRCDIR    = src
-OBJDIR    = build/obj
-DEPDIR    = build/dep
+BLDDIR    = .
 
 SUBDIR_R  = release
 SUBDIR_D  = debug
@@ -88,12 +87,21 @@ MKBIN_D   = $(CXX) $(CXXFLAGS) $(FLAGS_D) $^ $(LDFLAGS) -o $@
 #------------------ Are you sure you know what you're doing? ------------------#
 #==============================================================================#
 
+# Checks
+
+ifeq ($(BLDDIR), .)
+  $(error "You MONSTER, never set BLDDIR to '.'. This clutters the directories and complicates cleaning.")
+endif
+
 # Functions
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 
 
 # Variables
+
+OBJDIR ::= $(BLDDIR)/obj
+DEPDIR ::= $(BLDDIR)/dep
 
 OBJDIR_R ::= $(OBJDIR)/$(SUBDIR_R)
 OBJDIR_D ::= $(OBJDIR)/$(SUBDIR_D)
