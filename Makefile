@@ -166,7 +166,7 @@ c:
 clean: c
 	-$(RM) $(BIN_R)
 	-$(RM) $(BIN_D)
-	-if [ -d $(BINDIR) ]; then rmdir --ignore-fail-on-non-empty -p $(BINDIR); fi
+	-if [ -d $(BINDIR) ]; then rmdir --ignore-fail-on-non-empty -p "$$(cd '$(BINDIR)'; pwd)"; fi
 
 
 .SECONDEXPANSION:
