@@ -40,10 +40,7 @@
 
 # BINDIR     Directory in which the binaries are placed
 # SRCDIR     Directory in which to look for C++ source files
-# OBJDIR     Directory in which generated object files are placed
-# DEPDIR     Directory in which generated dependency files are placed
-# SUBDIR_R   Subdirectory for release build files
-# SUBDIR_D   Subdirectory for debug build files
+# BLDDIR     Directory in which generated object and dependency files are placed
 
 # SRCEXT     Extension of C++ source files
 # ARGS       Text to append to binary invocations (rules "run" and "drun")
@@ -71,11 +68,7 @@ BINNAME_D = $(BINNAME_R)_debug
 
 BINDIR    = bin
 SRCDIR    = src
-OBJDIR    = build/obj
-DEPDIR    = build/dep
-
-SUBDIR_R  = release
-SUBDIR_D  = debug
+BLDDIR    = build
 
 SRCEXT    = .cpp
 ARGS      =
@@ -88,12 +81,25 @@ MKBIN_D   = $(CXX) $(CXXFLAGS) $(FLAGS_D) $^ $(LDFLAGS) -o $@
 #------------------ Are you sure you know what you're doing? ------------------#
 #==============================================================================#
 
+# Checks
+
+ifeq ($(BLDDIR), .)
+  $(error You MONSTER, never set BLDDIR to '.'! It would clutter your project directory)
+endif
+
+
 # Functions
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 
 
 # Variables
+
+OBJDIR ::= $(BLDDIR)/obj
+DEPDIR ::= $(BLDDIR)/dep
+
+SUBDIR_R ::= release
+SUBDIR_D ::= debug
 
 OBJDIR_R ::= $(OBJDIR)/$(SUBDIR_R)
 OBJDIR_D ::= $(OBJDIR)/$(SUBDIR_D)
@@ -151,16 +157,16 @@ include $(wildcard $(DEPS))
 
 .PHONY: c
 c:
-	-find . -type f -path './$(OBJDIR)/*.o'  -exec $(RM) {} +
-	-find . -type f -path './$(DEPDIR)/*.d'  -exec $(RM) {} +
-	-find . -type f -path './$(DEPDIR)/*.Td' -exec $(RM) {} +
+	-if [ -d '$(OBJDIR)' ]; then find '$(OBJDIR)' -type f -name '*.o'  -exec $(RM) {} +; fi
+	-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.d'  -exec $(RM) {} +; fi
+	-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.Td' -exec $(RM) {} +; fi
 	-find $(OBJDIR) $(DEPDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
 
 .PHONY: clean
 clean: c
 	-$(RM) $(BIN_R)
 	-$(RM) $(BIN_D)
-	-find $(BINDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
+	-if [ -d $(BINDIR) ]; then rmdir --ignore-fail-on-non-empty -p "$$(cd '$(BINDIR)'; pwd)"; fi
 
 
 .SECONDEXPANSION:
