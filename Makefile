@@ -144,37 +144,43 @@ drun: debug
 	$(BIN_D) $(ARGS)
 
 %/.:
-	mkdir -p $@
+	@mkdir -p $@
 
 $(BIN_R): $(OBJS_R) | $(BINDIR)/.
-	$(MKBIN_R)
+	@echo 'Creating $@'
+	@$(MKBIN_R)
 
 $(BIN_D): $(OBJS_D) | $(BINDIR)/.
-	$(MKBIN_D)
+	@echo 'Creating $@'
+	@$(MKBIN_D)
 
 $(DEPS): ;
 include $(wildcard $(DEPS))
 
 .PHONY: c
 c:
-	-if [ -d '$(OBJDIR)' ]; then find '$(OBJDIR)' -type f -name '*.o'  -exec $(RM) {} +; fi
-	-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.d'  -exec $(RM) {} +; fi
-	-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.Td' -exec $(RM) {} +; fi
-	-find $(OBJDIR) $(DEPDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
+	@echo 'Removing cached build byproducts'
+	@-if [ -d '$(OBJDIR)' ]; then find '$(OBJDIR)' -type f -name '*.o'  -exec $(RM) {} +; fi
+	@-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.d'  -exec $(RM) {} +; fi
+	@-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.Td' -exec $(RM) {} +; fi
+	@-find $(OBJDIR) $(DEPDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
 
 .PHONY: clean
 clean: c
-	-$(RM) $(BIN_R)
-	-$(RM) $(BIN_D)
-	-if [ -d $(BINDIR) ]; then rmdir --ignore-fail-on-non-empty -p "$$(cd '$(BINDIR)'; pwd)"; fi
+	@echo 'Removing generated binaries'
+	@-$(RM) $(BIN_R)
+	@-$(RM) $(BIN_D)
+	@-if [ -d $(BINDIR) ]; then rmdir --ignore-fail-on-non-empty -p "$$(cd '$(BINDIR)'; pwd)"; fi
 
 
 .SECONDEXPANSION:
 
 $(OBJDIR_R)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_R)/%.d | $$(dir $$@). $$(dir $(DEPDIR_R)/$$*.d).
-	$(CXX) $(CXXFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R)
-	$(POSTCOMPILE_R)
+	@echo 'Compiling $<'
+	@$(CXX) $(CXXFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R)
+	@$(POSTCOMPILE_R)
 
 $(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $$(dir $$@). $$(dir $(DEPDIR_D)/$$*.d).
-	$(CXX) $(CXXFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D)
-	$(POSTCOMPILE_D)
+	@echo 'Compiling $<'
+	@$(CXX) $(CXXFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D)
+	@$(POSTCOMPILE_D)
