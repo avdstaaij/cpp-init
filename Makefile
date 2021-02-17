@@ -29,14 +29,15 @@
 # The variables below the "Settings" header can be altered to change the build
 # behavior. Their meaning is as follows:
 
+# BINNAME_R  The name of the generated release binary
+# BINNAME_D  The name of the genereated debug binary
+
 # CXX        The C++ compiler
 # CXXFLAGS   Compiler flags, both for building object files and linking them
 # FLAGS_R    Release-specific compiler flags
 # FLAGS_D    Debug-specific compiler flags
 # LDFLAGS    Compiler flags used when linking the the binary
 # INCFLAGS   Compiler flags for file inclusion; used for building object files
-# BINNAME_R  The name of the generated release binary
-# BINNAME_D  The name of the genereated debug binary
 
 # BINDIR     Directory in which the binaries are placed
 # SRCDIR     Directory in which to look for C++ source files
@@ -58,16 +59,15 @@
 #---------------------------------- Settings ----------------------------------#
 #==============================================================================#
 
-CXX       = g++
+BINNAME_R = BINARYNAME_PLACEHOLDER
+BINNAME_D = $(BINNAME_R)_debug
 
+CXX       = g++
 CXXFLAGS  = -std=c++17 -Wall -Wextra -Wignored-qualifiers
 FLAGS_R   = -O2
 FLAGS_D   = -g
 LDFLAGS   =
 INCFLAGS  = -I include
-
-BINNAME_R = BINARYNAME_PLACEHOLDER
-BINNAME_D = $(BINNAME_R)_debug
 
 BINDIR    = bin
 SRCDIR    = src
