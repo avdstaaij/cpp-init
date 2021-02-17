@@ -51,6 +51,8 @@
 # these commands with $^ set to the list of object files and $@ set to the path
 # of the binary to create.
 
+# FILE_TPUT  The tput commands used to style filenames in progress messages
+
 #==============================================================================#
 #---------------------------------- Settings ----------------------------------#
 #==============================================================================#
@@ -76,6 +78,8 @@ RM        = rm -f
 
 MKBIN_R   = $(CXX) $(CXXFLAGS) $(FLAGS_R) $^ $(LDFLAGS) -o $@
 MKBIN_D   = $(CXX) $(CXXFLAGS) $(FLAGS_D) $^ $(LDFLAGS) -o $@
+
+FILE_TPUT = tput bold; tput setaf 3
 
 #==============================================================================#
 #------------------ Are you sure you know what you're doing? ------------------#
@@ -122,6 +126,13 @@ DEPGENFLAGS_D = -MT "$@" -MMD -MP -MF $(DEPDIR_D)/$*.Td
 POSTCOMPILE_R = mv -f $(DEPDIR_R)/$*.Td $(DEPDIR_R)/$*.d && touch $@
 POSTCOMPILE_D = mv -f $(DEPDIR_D)/$*.Td $(DEPDIR_D)/$*.d && touch $@
 
+FILE_TPUT_BEGIN ::=
+FILE_TPUT_END   ::=
+ifneq ($(shell tput -V 2>/dev/null),)
+	FILE_TPUT_BEGIN ::= $(shell $(FILE_TPUT))
+	FILE_TPUT_END   ::= $(shell tput sgr0)
+endif
+
 
 # Targets
 
@@ -147,11 +158,11 @@ drun: debug
 	@mkdir -p $@
 
 $(BIN_R): $(OBJS_R) | $(BINDIR)/.
-	@echo 'Creating $@'
+	@echo 'Creating $(FILE_TPUT_BEGIN)$@$(FILE_TPUT_END)'
 	@$(MKBIN_R)
 
 $(BIN_D): $(OBJS_D) | $(BINDIR)/.
-	@echo 'Creating $@'
+	@echo 'Creating $(FILE_TPUT_BEGIN)$@$(FILE_TPUT_END)'
 	@$(MKBIN_D)
 
 $(DEPS): ;
@@ -176,11 +187,11 @@ clean: c
 .SECONDEXPANSION:
 
 $(OBJDIR_R)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_R)/%.d | $$(dir $$@). $$(dir $(DEPDIR_R)/$$*.d).
-	@echo 'Compiling $<'
+	@echo 'Compiling $(FILE_TPUT_BEGIN)$<$(FILE_TPUT_END)'
 	@$(CXX) $(CXXFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R)
 	@$(POSTCOMPILE_R)
 
 $(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $$(dir $$@). $$(dir $(DEPDIR_D)/$$*.d).
-	@echo 'Compiling $<'
+	@echo 'Compiling $(FILE_TPUT_BEGIN)$<$(FILE_TPUT_END)'
 	@$(CXX) $(CXXFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D)
 	@$(POSTCOMPILE_D)
