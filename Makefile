@@ -51,6 +51,7 @@
 # these commands with $^ set to the list of object files and $@ set to the path
 # of the binary to create.
 
+# VERBOSE    Should be 0 or 1; if 1, all executed commands are fully printed
 # FILE_TPUT  The tput commands used to style filenames in progress messages
 
 #==============================================================================#
@@ -79,6 +80,7 @@ RM        = rm -f
 MKBIN_R   = $(CXX) $(CXXFLAGS) $(FLAGS_R) $^ $(LDFLAGS) -o $@
 MKBIN_D   = $(CXX) $(CXXFLAGS) $(FLAGS_D) $^ $(LDFLAGS) -o $@
 
+VERBOSE   = 0
 FILE_TPUT = tput bold; tput setaf 3
 
 #==============================================================================#
@@ -89,6 +91,10 @@ FILE_TPUT = tput bold; tput setaf 3
 
 ifeq ($(BLDDIR), .)
   $(error You MONSTER, never set BLDDIR to '.'! It would clutter your project directory)
+endif
+
+ifeq ($(findstring $(VERBOSE),01),)
+  $(error The VERBOSE variable is set to "$(VERBOSE)", but it should be either 0 or 1)
 endif
 
 
@@ -126,6 +132,11 @@ DEPGENFLAGS_D = -MT "$@" -MMD -MP -MF $(DEPDIR_D)/$*.Td
 POSTCOMPILE_R = mv -f $(DEPDIR_R)/$*.Td $(DEPDIR_R)/$*.d && touch $@
 POSTCOMPILE_D = mv -f $(DEPDIR_D)/$*.Td $(DEPDIR_D)/$*.d && touch $@
 
+QUIET ::= @
+ifeq ($(VERBOSE),1)
+	QUIET ::=
+endif
+
 FILE_TPUT_BEGIN ::=
 FILE_TPUT_END   ::=
 ifneq ($(shell tput -V 2>/dev/null),)
@@ -150,20 +161,20 @@ release: $(BIN_R)
 
 .PHONY: rrun drun
 rrun: release
-	$(BIN_R) $(ARGS)
+	$(QUIET)$(BIN_R) $(ARGS)
 drun: debug
-	$(BIN_D) $(ARGS)
+	$(QUIET)$(BIN_D) $(ARGS)
 
 %/.:
-	@mkdir -p $@
+	$(QUIET)mkdir -p $@
 
 $(BIN_R): $(OBJS_R) | $(BINDIR)/.
 	@echo 'Creating $(FILE_TPUT_BEGIN)$@$(FILE_TPUT_END)'
-	@$(MKBIN_R)
+	$(QUIET)$(MKBIN_R)
 
 $(BIN_D): $(OBJS_D) | $(BINDIR)/.
 	@echo 'Creating $(FILE_TPUT_BEGIN)$@$(FILE_TPUT_END)'
-	@$(MKBIN_D)
+	$(QUIET)$(MKBIN_D)
 
 $(DEPS): ;
 include $(wildcard $(DEPS))
@@ -171,27 +182,27 @@ include $(wildcard $(DEPS))
 .PHONY: c
 c:
 	@echo 'Removing cached build byproducts'
-	@-if [ -d '$(OBJDIR)' ]; then find '$(OBJDIR)' -type f -name '*.o'  -exec $(RM) {} +; fi
-	@-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.d'  -exec $(RM) {} +; fi
-	@-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.Td' -exec $(RM) {} +; fi
-	@-find $(OBJDIR) $(DEPDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
+	$(QUIET)-if [ -d '$(OBJDIR)' ]; then find '$(OBJDIR)' -type f -name '*.o'  -exec $(RM) {} +; fi
+	$(QUIET)-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.d'  -exec $(RM) {} +; fi
+	$(QUIET)-if [ -d '$(DEPDIR)' ]; then find '$(DEPDIR)' -type f -name '*.Td' -exec $(RM) {} +; fi
+	$(QUIET)-find $(OBJDIR) $(DEPDIR) -type d -empty -exec 'rmdir' '-p' {} \; 2>/dev/null || true
 
 .PHONY: clean
 clean: c
 	@echo 'Removing generated binaries'
-	@-$(RM) $(BIN_R)
-	@-$(RM) $(BIN_D)
-	@-if [ -d $(BINDIR) ]; then rmdir --ignore-fail-on-non-empty -p "$$(cd '$(BINDIR)'; pwd)"; fi
+	$(QUIET)-$(RM) $(BIN_R)
+	$(QUIET)-$(RM) $(BIN_D)
+	$(QUIET)-if [ -d $(BINDIR) ]; then rmdir --ignore-fail-on-non-empty -p "$$(cd '$(BINDIR)'; pwd)"; fi
 
 
 .SECONDEXPANSION:
 
 $(OBJDIR_R)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_R)/%.d | $$(dir $$@). $$(dir $(DEPDIR_R)/$$*.d).
 	@echo 'Compiling $(FILE_TPUT_BEGIN)$<$(FILE_TPUT_END)'
-	@$(CXX) $(CXXFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R)
-	@$(POSTCOMPILE_R)
+	$(QUIET)$(CXX) $(CXXFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R)
+	$(QUIET)$(POSTCOMPILE_R)
 
 $(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $$(dir $$@). $$(dir $(DEPDIR_D)/$$*.d).
 	@echo 'Compiling $(FILE_TPUT_BEGIN)$<$(FILE_TPUT_END)'
-	@$(CXX) $(CXXFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D)
-	@$(POSTCOMPILE_D)
+	$(QUIET)$(CXX) $(CXXFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D)
+	$(QUIET)$(POSTCOMPILE_D)
