@@ -64,8 +64,8 @@ BINNAME_D = $(BINNAME_R)_debug
 
 CXX       = g++
 CXXFLAGS  = -std=c++17 -Wall -Wextra -Wignored-qualifiers
-FLAGS_R   = -O2
-FLAGS_D   = -g
+FLAGS_R   = -O2 -DNDEBUG
+FLAGS_D   = -Og -g3 -DDEBUG
 LDFLAGS   =
 INCFLAGS  = -I include
 
