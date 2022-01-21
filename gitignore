@@ -9,6 +9,7 @@ BINARYNAME_PLACEHOLDER_debug
 
 # Prerequisites
 *.d
+*.Td
 
 # Compiled Object files
 *.slo
