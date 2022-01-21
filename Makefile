@@ -1,4 +1,4 @@
-# Generic C++ Makefile
+# Generic C/C++ Makefile
 # Made by Arthur van der Staaij and Aron de Jong
 
 # To download the latest version, report issues or request new features, visit
@@ -21,7 +21,7 @@
 # To use "run" and "drun" with arguments, use:
 # make run ARGS="arguments here"
 
-# The rules in this Makefile store generated object files and keep track of C++
+# The rules in this Makefile store generated object files and keep track of
 # dependencies through dependency files to minimize recompilation time.
 # Because the dependency generation is fully automated using compiler tools,
 # there is no need to specify a header extension (e.g. ".h").
@@ -32,18 +32,22 @@
 # BINNAME_R  The name of the generated release binary
 # BINNAME_D  The name of the genereated debug binary
 
+# CC         The C compiler
 # CXX        The C++ compiler
-# CXXFLAGS   Compiler flags, both for building object files and linking them
+# FLAGS      By default, prepended to CFLAGS and CXXFLANGS; common C/C++ flags
+# CFLAGS     Compiler flags used for building C object files
+# CXXFLAGS   Compiler flags used for building and linking C++ object files
 # FLAGS_R    Release-specific compiler flags
 # FLAGS_D    Debug-specific compiler flags
 # LDFLAGS    Compiler flags used when linking the the binary
 # INCFLAGS   Compiler flags for file inclusion; used for building object files
 
 # BINDIR     Directory in which the binaries are placed
-# SRCDIR     Directory in which to look for C++ source files
+# SRCDIR     Directory in which to look for C/C++ source files
 # BLDDIR     Directory in which generated object and dependency files are placed
 
-# SRCEXT     Extension of C++ source files
+# SRCEXT_CXX Extension of C++ source files
+# SRCEXT_C   Extension of C source files
 # ARGS       Text to append to binary invocations (rules "run" and "drun")
 # RM         The command that is used to remove files (rules "c" and "clean")
 
@@ -62,20 +66,24 @@
 BINNAME_R = BINARYNAME_PLACEHOLDER
 BINNAME_D = $(BINNAME_R)_debug
 
+CC        = gcc
 CXX       = g++
-CXXFLAGS  = -std=c++17 -Wall -Wextra -Wignored-qualifiers
+FLAGS     = -Wall -Wextra -Wignored-qualifiers
+CFLAGS    = $(FLAGS)
+CXXFLAGS  = $(FLAGS) -std=c++17
 FLAGS_R   = -O2 -DNDEBUG
 FLAGS_D   = -Og -g3 -DDEBUG
 LDFLAGS   =
-INCFLAGS  = -I include
+INCFLAGS  = -I $(SRCDIR)
 
 BINDIR    = bin
 SRCDIR    = src
 BLDDIR    = build
 
-SRCEXT    = .cpp
-ARGS      =
-RM        = rm -f
+SRCEXT_CXX = .cpp
+SRCEXT_C   = .c
+ARGS       =
+RM         = rm -f
 
 MKBIN_R   = $(CXX) $(CXXFLAGS) $(FLAGS_R) $^ $(LDFLAGS) -o $@
 MKBIN_D   = $(CXX) $(CXXFLAGS) $(FLAGS_D) $^ $(LDFLAGS) -o $@
@@ -108,29 +116,44 @@ rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst 
 OBJDIR := $(BLDDIR)/obj
 DEPDIR := $(BLDDIR)/dep
 
-SUBDIR_R := release
-SUBDIR_D := debug
+SUBDIR_R   := release
+SUBDIR_D   := debug
+SUBDIR_CXX := cpp
+SUBDIR_C   := c
 
-OBJDIR_R := $(OBJDIR)/$(SUBDIR_R)
-OBJDIR_D := $(OBJDIR)/$(SUBDIR_D)
-DEPDIR_R := $(DEPDIR)/$(SUBDIR_R)
-DEPDIR_D := $(DEPDIR)/$(SUBDIR_D)
+OBJDIR_R_CXX := $(OBJDIR)/$(SUBDIR_R)/$(SUBDIR_CXX)
+OBJDIR_D_CXX := $(OBJDIR)/$(SUBDIR_D)/$(SUBDIR_CXX)
+DEPDIR_R_CXX := $(DEPDIR)/$(SUBDIR_R)/$(SUBDIR_CXX)
+DEPDIR_D_CXX := $(DEPDIR)/$(SUBDIR_D)/$(SUBDIR_CXX)
+OBJDIR_R_C   := $(OBJDIR)/$(SUBDIR_R)/$(SUBDIR_C)
+OBJDIR_D_C   := $(OBJDIR)/$(SUBDIR_D)/$(SUBDIR_C)
+DEPDIR_R_C   := $(DEPDIR)/$(SUBDIR_R)/$(SUBDIR_C)
+DEPDIR_D_C   := $(DEPDIR)/$(SUBDIR_D)/$(SUBDIR_C)
 
-SOURCES := $(call rwildcard,$(SRCDIR)/,*$(SRCEXT))
-OBJS_R  := $(patsubst $(SRCDIR)/%$(SRCEXT),$(OBJDIR_R)/%.o,$(SOURCES))
-OBJS_D  := $(patsubst $(SRCDIR)/%$(SRCEXT),$(OBJDIR_D)/%.o,$(SOURCES))
+SOURCES_CXX := $(call rwildcard,$(SRCDIR)/,*$(SRCEXT_CXX))
+SOURCES_C   := $(call rwildcard,$(SRCDIR)/,*$(SRCEXT_C))
+OBJS_R      := $(patsubst $(SRCDIR)/%$(SRCEXT_CXX),$(OBJDIR_R_CXX)/%.o,$(SOURCES_CXX)) \
+               $(patsubst $(SRCDIR)/%$(SRCEXT_C),$(OBJDIR_R_C)/%.o,$(SOURCES_C))
+OBJS_D      := $(patsubst $(SRCDIR)/%$(SRCEXT_CXX),$(OBJDIR_D_CXX)/%.o,$(SOURCES_CXX)) \
+               $(patsubst $(SRCDIR)/%$(SRCEXT_C),$(OBJDIR_D_C)/%.o,$(SOURCES_C))
 
-DEPS := $(patsubst $(SRCDIR)/%$(SRCEXT),$(DEPDIR_R)/%.d,$(SOURCES)) \
-         $(patsubst $(SRCDIR)/%$(SRCEXT),$(DEPDIR_D)/%.d,$(SOURCES))
+DEPS := $(patsubst $(SRCDIR)/%$(SRCEXT_CXX),$(DEPDIR_R_CXX)/%.d,$(SOURCES_CXX)) \
+        $(patsubst $(SRCDIR)/%$(SRCEXT_CXX),$(DEPDIR_D_CXX)/%.d,$(SOURCES_CXX)) \
+        $(patsubst $(SRCDIR)/%$(SRCEXT_C),$(DEPDIR_R_C)/%.d,$(SOURCES_C))     \
+        $(patsubst $(SRCDIR)/%$(SRCEXT_C),$(DEPDIR_D_C)/%.d,$(SOURCES_C))
 
 BIN_R := $(BINDIR)/$(BINNAME_R)
 BIN_D := $(BINDIR)/$(BINNAME_D)
 
-DEPGENFLAGS_R = -MT "$@" -MMD -MP -MF $(DEPDIR_R)/$*.Td
-DEPGENFLAGS_D = -MT "$@" -MMD -MP -MF $(DEPDIR_D)/$*.Td
+DEPGENFLAGS_R_CXX = -MT "$@" -MMD -MP -MF $(DEPDIR_R_CXX)/$*.Td
+DEPGENFLAGS_D_CXX = -MT "$@" -MMD -MP -MF $(DEPDIR_D_CXX)/$*.Td
+DEPGENFLAGS_R_C = -MT "$@" -MMD -MP -MF $(DEPDIR_R_C)/$*.Td
+DEPGENFLAGS_D_C = -MT "$@" -MMD -MP -MF $(DEPDIR_D_C)/$*.Td
 
-POSTCOMPILE_R = mv -f $(DEPDIR_R)/$*.Td $(DEPDIR_R)/$*.d && touch $@
-POSTCOMPILE_D = mv -f $(DEPDIR_D)/$*.Td $(DEPDIR_D)/$*.d && touch $@
+POSTCOMPILE_R_CXX = mv -f $(DEPDIR_R_CXX)/$*.Td $(DEPDIR_R_CXX)/$*.d && touch $@
+POSTCOMPILE_D_CXX = mv -f $(DEPDIR_D_CXX)/$*.Td $(DEPDIR_D_CXX)/$*.d && touch $@
+POSTCOMPILE_R_C = mv -f $(DEPDIR_R_C)/$*.Td $(DEPDIR_R_C)/$*.d && touch $@
+POSTCOMPILE_D_C = mv -f $(DEPDIR_D_C)/$*.Td $(DEPDIR_D_C)/$*.d && touch $@
 
 QUIET := @
 ifeq ($(VERBOSE),1)
@@ -197,12 +220,22 @@ clean: c
 
 .SECONDEXPANSION:
 
-$(OBJDIR_R)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_R)/%.d | $$(dir $$@). $$(dir $(DEPDIR_R)/$$*.d).
+$(OBJDIR_R_CXX)/%.o: $(SRCDIR)/%$(SRCEXT_CXX) $(DEPDIR_R_CXX)/%.d | $$(dir $$@). $$(dir $(DEPDIR_R_CXX)/$$*.d).
 	@echo 'Compiling $(FILE_TPUT_BEGIN)$<$(FILE_TPUT_END)'
-	$(QUIET)$(CXX) $(CXXFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R)
-	$(QUIET)$(POSTCOMPILE_R)
+	$(QUIET)$(CXX) $(CXXFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R_CXX)
+	$(QUIET)$(POSTCOMPILE_R_CXX)
 
-$(OBJDIR_D)/%.o: $(SRCDIR)/%$(SRCEXT) $(DEPDIR_D)/%.d | $$(dir $$@). $$(dir $(DEPDIR_D)/$$*.d).
+$(OBJDIR_D_CXX)/%.o: $(SRCDIR)/%$(SRCEXT_CXX) $(DEPDIR_D_CXX)/%.d | $$(dir $$@). $$(dir $(DEPDIR_D_CXX)/$$*.d).
 	@echo 'Compiling $(FILE_TPUT_BEGIN)$<$(FILE_TPUT_END)'
-	$(QUIET)$(CXX) $(CXXFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D)
-	$(QUIET)$(POSTCOMPILE_D)
+	$(QUIET)$(CXX) $(CXXFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D_CXX)
+	$(QUIET)$(POSTCOMPILE_D_CXX)
+
+$(OBJDIR_R_C)/%.o: $(SRCDIR)/%$(SRCEXT_C) $(DEPDIR_R_C)/%.d | $$(dir $$@). $$(dir $(DEPDIR_R_C)/$$*.d).
+	@echo 'Compiling $(FILE_TPUT_BEGIN)$<$(FILE_TPUT_END)'
+	$(QUIET)$(CC) $(CFLAGS) $(FLAGS_R) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_R_C)
+	$(QUIET)$(POSTCOMPILE_R_C)
+
+$(OBJDIR_D_C)/%.o: $(SRCDIR)/%$(SRCEXT_C) $(DEPDIR_D_C)/%.d | $$(dir $$@). $$(dir $(DEPDIR_D_C)/$$*.d).
+	@echo 'Compiling $(FILE_TPUT_BEGIN)$<$(FILE_TPUT_END)'
+	$(QUIET)$(CC) $(CFLAGS) $(FLAGS_D) $(INCFLAGS) -c $< -o $@ $(DEPGENFLAGS_D_C)
+	$(QUIET)$(POSTCOMPILE_D_C)
