@@ -105,26 +105,26 @@ rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst 
 
 # Variables
 
-OBJDIR ::= $(BLDDIR)/obj
-DEPDIR ::= $(BLDDIR)/dep
+OBJDIR := $(BLDDIR)/obj
+DEPDIR := $(BLDDIR)/dep
 
-SUBDIR_R ::= release
-SUBDIR_D ::= debug
+SUBDIR_R := release
+SUBDIR_D := debug
 
-OBJDIR_R ::= $(OBJDIR)/$(SUBDIR_R)
-OBJDIR_D ::= $(OBJDIR)/$(SUBDIR_D)
-DEPDIR_R ::= $(DEPDIR)/$(SUBDIR_R)
-DEPDIR_D ::= $(DEPDIR)/$(SUBDIR_D)
+OBJDIR_R := $(OBJDIR)/$(SUBDIR_R)
+OBJDIR_D := $(OBJDIR)/$(SUBDIR_D)
+DEPDIR_R := $(DEPDIR)/$(SUBDIR_R)
+DEPDIR_D := $(DEPDIR)/$(SUBDIR_D)
 
-SOURCES ::= $(call rwildcard,$(SRCDIR)/,*$(SRCEXT))
-OBJS_R  ::= $(patsubst $(SRCDIR)/%$(SRCEXT),$(OBJDIR_R)/%.o,$(SOURCES))
-OBJS_D  ::= $(patsubst $(SRCDIR)/%$(SRCEXT),$(OBJDIR_D)/%.o,$(SOURCES))
+SOURCES := $(call rwildcard,$(SRCDIR)/,*$(SRCEXT))
+OBJS_R  := $(patsubst $(SRCDIR)/%$(SRCEXT),$(OBJDIR_R)/%.o,$(SOURCES))
+OBJS_D  := $(patsubst $(SRCDIR)/%$(SRCEXT),$(OBJDIR_D)/%.o,$(SOURCES))
 
-DEPS ::= $(patsubst $(SRCDIR)/%$(SRCEXT),$(DEPDIR_R)/%.d,$(SOURCES)) \
+DEPS := $(patsubst $(SRCDIR)/%$(SRCEXT),$(DEPDIR_R)/%.d,$(SOURCES)) \
          $(patsubst $(SRCDIR)/%$(SRCEXT),$(DEPDIR_D)/%.d,$(SOURCES))
 
-BIN_R ::= $(BINDIR)/$(BINNAME_R)
-BIN_D ::= $(BINDIR)/$(BINNAME_D)
+BIN_R := $(BINDIR)/$(BINNAME_R)
+BIN_D := $(BINDIR)/$(BINNAME_D)
 
 DEPGENFLAGS_R = -MT "$@" -MMD -MP -MF $(DEPDIR_R)/$*.Td
 DEPGENFLAGS_D = -MT "$@" -MMD -MP -MF $(DEPDIR_D)/$*.Td
@@ -132,16 +132,16 @@ DEPGENFLAGS_D = -MT "$@" -MMD -MP -MF $(DEPDIR_D)/$*.Td
 POSTCOMPILE_R = mv -f $(DEPDIR_R)/$*.Td $(DEPDIR_R)/$*.d && touch $@
 POSTCOMPILE_D = mv -f $(DEPDIR_D)/$*.Td $(DEPDIR_D)/$*.d && touch $@
 
-QUIET ::= @
+QUIET := @
 ifeq ($(VERBOSE),1)
-	QUIET ::=
+	QUIET :=
 endif
 
-FILE_TPUT_BEGIN ::=
-FILE_TPUT_END   ::=
+FILE_TPUT_BEGIN :=
+FILE_TPUT_END   :=
 ifneq ($(shell tput -V 2>/dev/null),)
-	FILE_TPUT_BEGIN ::= $(shell $(FILE_TPUT))
-	FILE_TPUT_END   ::= $(shell tput sgr0)
+	FILE_TPUT_BEGIN := $(shell $(FILE_TPUT))
+	FILE_TPUT_END   := $(shell tput sgr0)
 endif
 
 
